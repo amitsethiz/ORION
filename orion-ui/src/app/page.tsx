@@ -166,7 +166,21 @@ export default function OrionPage() {
           />
 
           {/* Camera feed */}
-          <CameraFeed stream={hardware.cameraStream} enabled={hardware.cameraEnabled} />
+          <CameraFeed
+            stream={hardware.cameraStream}
+            enabled={hardware.cameraEnabled}
+            onAnalysis={(analysis) => {
+              if (!analysis) return;
+              const visionMsg: ChatMessage = {
+                id: uuidv4(),
+                role: "assistant",
+                content: `[VISION ANALYSIS]\n\n${analysis}`,
+                timestamp: new Date(),
+                provider: "vision",
+              };
+              setMessages((prev) => [...prev, visionMsg]);
+            }}
+          />
 
           {/* Session info */}
           <div className="mt-auto w-full rounded border border-orion-border/50 p-2">

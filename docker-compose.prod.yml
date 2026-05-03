@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+
+  # ─── O.R.I.O.N. Backend API ──────────────────────────────────────
+  orion-api:
+    build:
+      context: ./orion-api
+      dockerfile: Dockerfile
+    image: orion-api:latest
+    container_name: orion-api-prod
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - APP_ENV=production
+      - DATABASE_URL=sqlite+aiosqlite:////app/data/orion_memory.db
+    volumes:
+      - orion-db:/app/data
+    networks:
+      - orion-net
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # ─── O.R.I.O.N. Frontend UI ──────────────────────────────────────
+  orion-ui:
+    build:
+      context: ./orion-ui
+      dockerfile: Dockerfile
+    image: orion-ui:latest
+    container_name: orion-ui-prod
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://orion-api:8000
+      - NEXT_PUBLIC_WS_URL=ws://orion-api:8000
+    networks:
+      - orion-net
+    depends_on:
+      orion-api:
+        condition: service_healthy
+
+networks:
+  orion-net:
+    driver: bridge
+
+volumes:
+  orion-db:
+    driver: local

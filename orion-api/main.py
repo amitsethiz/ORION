@@ -6,7 +6,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.config import settings
-from routers import chat, health, config_router
+from routers import chat, health, config_router, vision, sessions
+from services.memory.database import init_db
 
 logging.basicConfig(
     stream=sys.stdout,
@@ -18,7 +19,8 @@ logger = logging.getLogger("orion")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("O.R.I.O.N. API starting up — environment: %s", settings.app_env)
+    logger.info("O.R.I.O.N. API starting — env: %s", settings.app_env)
+    await init_db()
     logger.info(
         "LLM tiers: [1] %s/%s  [2] %s/%s  [3] %s/%s",
         settings.llm_tier1_provider, settings.llm_tier1_model,
@@ -49,6 +51,8 @@ def create_app() -> FastAPI:
 
     app.include_router(health.router)
     app.include_router(config_router.router)
+    app.include_router(sessions.router)
+    app.include_router(vision.router)
     app.include_router(chat.router)
 
     return app
