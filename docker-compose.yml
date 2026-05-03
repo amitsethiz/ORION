@@ -1,0 +1,68 @@
+version: "3.9"
+
+services:
+
+  # ─── O.R.I.O.N. Backend API ──────────────────────────────────────
+  orion-api:
+    build:
+      context: ./orion-api
+      dockerfile: Dockerfile
+    container_name: orion-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./orion-api:/app
+      - orion-db:/app/data
+    networks:
+      - orion-net
+    depends_on:
+      - ollama
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─── O.R.I.O.N. Frontend UI ──────────────────────────────────────
+  orion-ui:
+    build:
+      context: ./orion-ui
+      dockerfile: Dockerfile
+    container_name: orion-ui
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8000
+    networks:
+      - orion-net
+    depends_on:
+      - orion-api
+
+  # ─── Ollama (Local LLM Server — optional) ────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    container_name: orion-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    networks:
+      - orion-net
+    profiles:
+      - local-llm    # run with: docker-compose --profile local-llm up
+
+networks:
+  orion-net:
+    driver: bridge
+
+volumes:
+  orion-db:
+  ollama-models:

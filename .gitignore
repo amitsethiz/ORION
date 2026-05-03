@@ -1,0 +1,55 @@
+# ─── Claude Code (never commit — may contain API keys) ───────────────────────
+.claude/
+
+# ─── Environment & Secrets ───────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# ─── Python / orion-api ───────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+orion-api/.venv/
+orion-api/venv/
+orion-api/*.egg-info/
+orion-api/dist/
+orion-api/build/
+orion-api/.pytest_cache/
+orion-api/.ruff_cache/
+orion-api/htmlcov/
+orion-api/.coverage
+orion-api/coverage.xml
+*.sqlite3
+*.db
+
+# ─── Node / orion-ui ──────────────────────────────────────────────────────────
+orion-ui/node_modules/
+orion-ui/.next/
+orion-ui/out/
+orion-ui/.turbo/
+orion-ui/dist/
+orion-ui/.eslintcache
+orion-ui/npm-debug.log*
+orion-ui/yarn-debug.log*
+orion-ui/yarn-error.log*
+
+# ─── OS & Editors ────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/settings.json
+*.swp
+*.swo
+
+# ─── Docker ───────────────────────────────────────────────────────────────────
+docker/data/
+
+# ─── Misc ────────────────────────────────────────────────────────────────────
+*.log
+*.tmp
+.cache/
